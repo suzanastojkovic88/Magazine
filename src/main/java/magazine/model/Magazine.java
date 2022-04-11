@@ -6,6 +6,8 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,6 +31,9 @@ public class Magazine {
 
     @Transient
     private Double discountedPrice;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Topic> topics = new ArrayList<>();
 
     public Double getDiscountedPrice() {
         return price - (price * 0.15);
