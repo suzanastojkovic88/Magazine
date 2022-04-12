@@ -1,7 +1,6 @@
 package magazine.service;
 
-import magazine.model.Magazine;
-import magazine.model.Topic;
+import magazine.dto.TopicDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,7 +8,11 @@ import java.util.List;
 @Service
 public interface TopicService {
 
-    public List<Topic> findAllTopics();
+    List<TopicDTO> findAllTopics();
 
-    public Topic findTopic(Long id);
+    TopicDTO findTopic(Long id);
+
+    TopicDTO saveTopic(TopicDTO topicDTO);
+
+    void deleteTopic(Long id);
 }

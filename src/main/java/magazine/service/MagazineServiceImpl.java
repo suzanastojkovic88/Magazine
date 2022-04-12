@@ -1,63 +1,46 @@
 package magazine.service;
 
+import lombok.RequiredArgsConstructor;
+import magazine.dto.MagazineDTO;
 import magazine.model.Magazine;
 import magazine.repository.MagazineRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class MagazineServiceImpl implements MagazineService {
 
+    private final ModelMapper modelMapper;
+
     private final MagazineRepository magazineRepository;
 
-    @Autowired
-    public MagazineServiceImpl(MagazineRepository magazineRepository) {
-        this.magazineRepository = magazineRepository;
+
+    @Override
+    public List<MagazineDTO> findAllMagazines() {
+        return magazineRepository.findAll().stream()
+                .map(magazine -> modelMapper.map(magazine, MagazineDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Magazine> findAllMagazines() {
-
-        return magazineRepository.findAll();
+    public MagazineDTO findMagazine(Long id) {
+        Magazine magazine = magazineRepository.findMagazineById(id)
+                .orElseThrow(()->new RuntimeException("Magazine with id "+ id + " does not exist."));
+        return modelMapper.map(magazine, MagazineDTO.class);
     }
 
     @Override
-    public Magazine findMagazine(Long id) {
-        boolean exists = magazineRepository.existsById(id);
-        if(!exists){
-            throw new IllegalStateException("Magazine with id " + id + " does not exist.");
-        }
-        Magazine magazine = magazineRepository.getById(id);
-        return magazine;
-    }
-
-    @Override
-    public Magazine saveMagazine(Magazine magazine) {
-        Optional<Magazine> m = magazineRepository
-                .findMagazineByTitle(magazine.getTitle());
-        if(m.isPresent()){
-            throw new IllegalStateException("Magazine is already added.");
-        }
-        return magazineRepository.save(magazine);
-    }
-
-    @Transactional
-    public Magazine updateMagazine(Long id, String date, Double price) {
-    Magazine magazine = magazineRepository.findById(id)
-            .orElseThrow(()-> new IllegalStateException(
-                    "Magazine with id " + id + " does not exist."));
-    if(date != null){
-        magazine.setDateOfPublication(LocalDate.parse(date));
-    }
-    if(price != null){
-        magazine.setPrice(price);
-    }
-        return magazine;
+    public MagazineDTO saveMagazine(MagazineDTO magazineDTO) {
+        Magazine magazine = modelMapper.map(magazineDTO, Magazine.class);
+        Magazine savedMagazine = magazineRepository.save(magazine);
+        return modelMapper.map(savedMagazine, MagazineDTO.class);
     }
 
     @Override
@@ -67,5 +50,20 @@ public class MagazineServiceImpl implements MagazineService {
             throw new IllegalStateException("Magazine with id " + id + " does not exist.");
         }
     magazineRepository.deleteById(id);
+    }
+
+    private MagazineDTO toDTO(Magazine magazine){
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.LOOSE);
+        MagazineDTO magazineDTO = new MagazineDTO();
+        magazineDTO = modelMapper.map(magazine, MagazineDTO.class);
+        return magazineDTO;
+    }
+    private Magazine toMagazine(MagazineDTO magazineDTO){
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.LOOSE);
+        Magazine magazine = new Magazine();
+        magazine = modelMapper.map(magazineDTO, Magazine.class);
+        return magazine;
     }
 }

@@ -1,11 +1,15 @@
 package magazine.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +25,7 @@ public class Magazine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name="title", nullable = false)
     private String title;
 
     private Integer edition;
@@ -32,8 +37,17 @@ public class Magazine {
     @Transient
     private Double discountedPrice;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(
+            mappedBy = "magazine",
+            fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Topic> topics = new ArrayList<>();
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     public Double getDiscountedPrice() {
         return price - (price * 0.15);

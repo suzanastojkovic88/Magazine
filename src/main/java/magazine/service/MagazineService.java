@@ -1,6 +1,5 @@
 package magazine.service;
-
-import magazine.model.Magazine;
+import magazine.dto.MagazineDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -8,13 +7,11 @@ import java.util.List;
 @Service
 public interface MagazineService {
 
-    public List<Magazine> findAllMagazines();
+    List<MagazineDTO> findAllMagazines();
 
-    public Magazine findMagazine(Long id);
+    MagazineDTO findMagazine(Long id);
 
-    public Magazine saveMagazine(Magazine magazine);
+    MagazineDTO saveMagazine(MagazineDTO magazineDTO);
 
-    public Magazine updateMagazine(Long id, String date, Double price);
-
-    public void deleteMagazine(Long id);
+    void deleteMagazine(Long id);
 }
