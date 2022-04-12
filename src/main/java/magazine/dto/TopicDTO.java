@@ -13,6 +13,8 @@ public class TopicDTO {
 
     private String author;
 
+    private Long magazineId;
+
     private String magazineTitle;
 
 }
